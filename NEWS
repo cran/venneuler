@@ -1,0 +1,13 @@
+ NEWS/ChangeLog for scagnostics
+--------------------------------
+
+1.0-0	2009-10-27
+    o	release on CRAN
+
+    o	updated documentation, changed set separator to &, added
+	matrix adjacency input, small fixes
+
+
+0.1-0	2009-08-20
+    o	first public release on RForge.net
+
