@@ -16,9 +16,7 @@ package edu.uic.ncdm.venn;
 
 import edu.uic.ncdm.venn.data.VennData;
 
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Set;
+import java.util.*;
 
 public class VennAnalytic {
     private int nRows;
@@ -64,7 +62,7 @@ public class VennAnalytic {
         double previousStress = stress;
 
         minimizeLocal();
-        
+
         if (stress > previousStress)
             copyCircles(previousCenters, centers);
         stress = computeStress();
@@ -84,6 +82,8 @@ public class VennAnalytic {
         }
         double[] residuals = new double[nPolygons - 1];
         String[] residualLabels = new String[nPolygons - 1];
+        double area = 0;
+        int nonZero = 0;
         for (int i = 1; i < nPolygons; i++) {
             residuals[i - 1] = polyAreas[i] - polyHats[i];
             char[] c = encode(i);
@@ -92,11 +92,19 @@ public class VennAnalytic {
                 if (c[j] == '1')
                     s += (circleLabels[j] + "&");
             }
-            s = s.substring(0, s.length() - 1);
-            residualLabels[i - 1] = s;
-            // System.out.println(residualLabels[i - 1] + " " + polyAreas[i] + " " + polyData[i]);
+            area += polyAreas[i];
+//            if (residuals[i - 1] != 0)
+//                nonZero++;
+//            s = s.substring(0, s.length() - 1);
+//            residualLabels[i - 1] = s;
+//            System.out.println(residualLabels[i - 1] + " " + residuals[i-1]+" "+polyAreas[i] + " " + polyData[i]);
         }
-        // System.out.println("stress = " + stress + ", stress01 = " + stress01 + ", stress05 = " + stress05);
+//        double cut = area / nonZero;
+//        for (int i = 0; i < residuals.length; i++) {
+//            if (Math.abs(residuals[i]) > cut)
+//                System.out.println("OUTLIER---> "+residualLabels[i]+" "+residuals[i]);
+//        }
+//        System.out.println("stress = " + stress + ", stress01 = " + stress01 + ", stress05 = " + stress05);
 
         return new VennDiagram(centers, diameters, polyAreas, residuals, circleLabels, residualLabels, colors,
                 stress, stress01, stress05);
@@ -270,12 +278,12 @@ public class VennAnalytic {
     }
 
     public void computeInitialConfiguration() {
-        if (nCircles < 3) {
+        double[][] s = computeDistanceMatrix();
+        if (s == null) {
             fixedStart();
             return;
         }
 
-        double[][] s = computeDistanceMatrix();
         double[] q = new double[nCircles];
         double[][] x = new double[nCircles][2];
 
@@ -320,6 +328,7 @@ public class VennAnalytic {
     }
 
     private double[][] computeDistanceMatrix() {
+        int nIntersections = 0;
         double[][] s = new double[nCircles][nCircles];
         for (int i = 0; i < nPolygons; i++) {
             char[] c = encode(i);
@@ -334,12 +343,16 @@ public class VennAnalytic {
                 }
             }
         }
-        for (int i = 1; i < s.length; i++) {
-            for (int j = 0; j < i; j++) {
-                s[i][j] = -s[i][j];
-                s[j][i] = s[i][j];
+        for (int j = 1; j < s.length; j++) {
+            for (int k = 0; k < j; k++) {
+                if (s[j][k] != 0)
+                    nIntersections++;
+                s[j][k] = -s[j][k];
+                s[k][j] = s[j][k];
             }
         }
+        if (nIntersections < nCircles)
+            s = null;
         return s;
     }
 

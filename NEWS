@@ -1,6 +1,9 @@
  NEWS/ChangeLog for scagnostics
 --------------------------------
 
+1.0-3	2010-09-17
+    o	improved behavior in some special cases
+
 1.0-2	2010-04-13
     o	more improvements and bugfixes
 
