@@ -1,0 +1,17 @@
+0fc17697f02622afdfea287139f8c0eb *DESCRIPTION
+b409cf4a5659c034c5ac6c839f1aa5ea *NAMESPACE
+bae6110882904bb3b4f721487ffbe502 *NEWS
+835ebee0928f0238592697865180c8aa *R/venneuler.R
+17422a3bc93df08d04e2d18380998896 *R/zzz.R
+5813693cbb492402f55c4217de3f8a35 *inst/java/venneuler.jar
+eb0ddf17f17153577e06345e679d34f6 *man/venneuler.Rd
+dd6d391d407d89bc5ee31d5663b6e826 *src-java/Makefile
+fd2aeb47bd5506d5263e81b7dcde5aed *src-java/edu/uic/ncdm/venn/Eigen.java
+91589e5b07228982ef89c7233f3477ba *src-java/edu/uic/ncdm/venn/Venn.java
+38579266d4ca455bac8c43e172132d07 *src-java/edu/uic/ncdm/venn/VennAnalytic.java
+a9e2e35d6bd461437ab1d34794d57c04 *src-java/edu/uic/ncdm/venn/VennDiagram.java
+1542d2e0c6e3ef73acb1f60af38575d3 *src-java/edu/uic/ncdm/venn/data/FilePicker.java
+72e3f0725664298ca723649f89ac00c3 *src-java/edu/uic/ncdm/venn/data/FileReader.java
+c737dab157a9eda33302f6aa512d3ad0 *src-java/edu/uic/ncdm/venn/data/VennData.java
+d2c94af240a4afa508688eadbaa96169 *src-java/edu/uic/ncdm/venn/display/VennCanvas.java
+94fbf40cb92f44ca6deebae2a7542f8f *src-java/edu/uic/ncdm/venn/display/VennFrame.java

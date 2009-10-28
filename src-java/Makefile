@@ -1,9 +1,9 @@
 JAVAC=javac
 JAR=jar
 JAVADOC=javadoc
-JDKVER=1.4
+JDKVER=1.5
 JFLAGS=-source $(JDKVER) -target $(JDKVER)
-JAPIURL=http://java.sun.com/j2se/1.4.2/docs/api
+JAPIURL=http://download.oracle.com/javase/1.5.0/docs/api/
 
 DOCSDIR=javaDoc
 
