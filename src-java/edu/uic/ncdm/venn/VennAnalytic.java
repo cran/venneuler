@@ -312,8 +312,8 @@ public class VennAnalytic {
         }
 
         for (int i = 0; i < nCircles; i++) {
-            centers[i][0] = .5 + .25 * x[i][0] / (max[0] - min[0]);
-            centers[i][1] = .5 + .25 * x[i][1] / (max[1] - min[1]);
+            centers[i][0] = .5 + .25 * x[i][0];
+            centers[i][1] = .5 + .25 * x[i][1];
         }
     }
 
@@ -340,20 +340,22 @@ public class VennAnalytic {
                         continue;
                     s[j][k] += polyData[i];
                     s[k][j] = s[j][k];
+                    nIntersections++;
                 }
             }
         }
-        for (int j = 1; j < s.length; j++) {
+
+        for (int j = 0; j < nCircles; j++) {
+            s[j][j] = 0;
             for (int k = 0; k < j; k++) {
-                if (s[j][k] != 0)
-                    nIntersections++;
-                s[j][k] = -s[j][k];
+                s[j][k] = 1 - s[j][k] / (circleData[j] + circleData[k]);
                 s[k][j] = s[j][k];
             }
         }
-        if (nIntersections < nCircles)
-            s = null;
-        return s;
+        if (nIntersections < 1)
+            return null;
+        else
+            return s;
     }
 
     private double estimateAdditiveConstant(int nPoints, double[][] s) {
