@@ -39,7 +39,7 @@ public class VennAnalytic {
     private int totalCount;
 
     public VennAnalytic() {
-        minStress = .0001;
+        minStress = .001;
         stress = 1.0;
     }
 
@@ -85,6 +85,7 @@ public class VennAnalytic {
             }
             s = s.substring(0, s.length() - 1);
             residualLabels[i - 1] = s;
+            // System.out.println(residualLabels[i - 1] + " " + polyAreas[i] + " " + polyData[i]);
         }
         // System.out.println("stress = " + stress + ", stress01 = " + stress01 + ", stress05 = " + stress05);
 
@@ -207,7 +208,7 @@ public class VennAnalytic {
         return Integer.parseInt(b, 2);
     }
 
-    private void renderVenn() {
+    private void calculateAreas() {
         totalCount = 0;
         int size = 200;
         byte[][][] bis = new byte[nCircles][size][size];
@@ -375,8 +376,9 @@ public class VennAnalytic {
         }
     }
 
-    private double computeLoss() {
+    private double computeStress() {
         /* regression through origin */
+        calculateAreas();
         double xx = 0;
         double xy = 0;
         int n = polyData.length;
@@ -409,58 +411,113 @@ public class VennAnalytic {
             if (isAreas)
                 area = circleData[j] / maxArea;
             else
-                area = (double) circleData[j] / nTot;
-            diameters[j] = 2. * Math.sqrt(area / Math.PI / nCircles);
+                area = circleData[j] / nTot;
+            diameters[j] = Math.sqrt(area / Math.PI / nCircles);
             maxDiameter = Math.max(diameters[j], maxDiameter);
         }
-        if (maxDiameter > .2) {
+        double minStress = 1;
+        double minSize = 1;
+        double[] d = new double[nCircles];
+        System.arraycopy(diameters, 0, d, 0, nCircles);
+        for (double size = 1; size < 2; size += .1) {
+            System.arraycopy(d, 0, diameters, 0, nCircles);
             for (int j = 0; j < nCircles; j++)
-                diameters[j] *= .2 / maxDiameter;
+                diameters[j] *= size;
+            double s = computeStress();
+            if (s < minStress) {
+                minStress = s;
+                minSize = size;
+            }
         }
+        System.arraycopy(d, 0, diameters, 0, nCircles);
+        for (int k = 0; k < nCircles; k++)
+            diameters[k] *= minSize;
     }
 
     private void estimatePositions() {
         double stepsize = .01;
-        double[][] bestCenters = new double[nCircles][2];
-        int worse = 0;
-        for (int iter = 0; iter < 500; iter++) {
+        double lastStress = 1;
+        rescale();
+        for (int iter = 0; iter < 100; iter++) {
             recenter();
-            renderVenn();
-            double s = computeLoss();
-            if (s < stress) {
-                stress = s;
-                copyCenters(bestCenters);
-                worse = 0;
-            } else {
-                worse++;
-            }
+            stress = computeStress();
             moveCenters(stepsize);
             // System.out.println("iteration, loss " + iter + " " + stress);
-            if (stress < minStress || worse > 50)
+            if (stress - lastStress > minStress)
+               stepsize = .5 * stepsize;
+            else if (stress < minStress || lastStress - stress < minStress)
                 break;
-        }
-        for (int i = 0; i < nCircles; i++) {
-            centers[i][0] = bestCenters[i][0];
-            centers[i][1] = bestCenters[i][1];
+            lastStress = stress;
         }
         recenter();
-        renderVenn();
-        computeLoss();
+        computeStress();
     }
 
     private void moveCenters(double stepsize) {
-        double[][] gradients = computeGradients(stepsize);
+        double[][] gradient;
+        if (stress < .1)
+            gradient = computeGradient1(stepsize);
+        else
+            gradient = computeGradient2(stepsize);
         for (int i = 0; i < nCircles; i++) {
-            centers[i][0] += gradients[i][0];
-            centers[i][1] += gradients[i][1];
+            centers[i][0] += gradient[i][0];
+            centers[i][1] += gradient[i][1];
         }
     }
 
-    private void copyCenters(double[][] bestCenters) {
-        for (int i = 0; i < nCircles; i++) {
-            bestCenters[i][0] = centers[i][0];
-            bestCenters[i][1] = centers[i][1];
+    private double[][] computeGradient1(double stepsize) {
+        double[][] gradient = new double[nCircles][2];
+        for (int i = 0; i < nPolygons; i++) {
+            char[] c = encode(i);
+            for (int j = 0; j < c.length; j++) {
+                if (c[j] == '0')
+                    continue;
+                for (int k = j + 1; k < c.length; k++) {
+                    if (c[k] == '0')
+                        continue;
+                    double resid = polyAreas[i] - polyHats[i];
+                    double dx = resid * stepsize * (centers[j][0] - centers[k][0]);
+                    double dy = resid * stepsize * (centers[j][1] - centers[k][1]);
+                    gradient[j][0] += dx;
+                    gradient[j][1] += dy;
+                    gradient[k][0] -= dx;
+                    gradient[k][1] -= dy;
+                }
+            }
         }
+        return gradient;
+    }
+
+    private double[][] computeGradient2(double stepsize) {
+        double[][] gradient = new double[nCircles][2];
+        for (int i = 0; i < nCircles; i++) {
+            double xMove;
+            double yMove;
+
+            centers[i][0] += stepsize;
+            double xPlus = computeStress();
+            centers[i][0] -= 2 * stepsize;
+            double xMinus = computeStress();
+            if (xPlus < xMinus)
+                xMove = stepsize;
+            else
+                xMove = -stepsize;
+            centers[i][0] += stepsize;
+
+            centers[i][1] += stepsize;
+            double yPlus = computeStress();
+            centers[i][1] -= 2 * stepsize;
+            double yMinus = computeStress();
+            if (yPlus < yMinus)
+                yMove = stepsize;
+            else
+                yMove = -stepsize;
+            centers[i][1] += stepsize;
+
+            gradient[i][0] = xMove;
+            gradient[i][1] = yMove;
+        }
+        return gradient;
     }
 
     private void recenter() {
@@ -475,31 +532,48 @@ public class VennAnalytic {
         for (int i = 0; i < nCircles; i++) {
             centers[i][0] = .5 + centers[i][0] - cx;
             centers[i][1] = .5 + centers[i][1] - cy;
-            centers[i][0] = Math.max(Math.min(centers[i][0], 1 - diameters[i] / 2), diameters[i] / 2);
-            centers[i][1] = Math.max(Math.min(centers[i][1], 1 - diameters[i] / 2), diameters[i] / 2);
         }
     }
 
-    private double[][] computeGradients(double stepsize) {
-        double[][] gradients = new double[nCircles][2];
-        for (int i = 0; i < nPolygons; i++) {
-            char[] c = encode(i);
-            for (int j = 0; j < c.length; j++) {
-                if (c[j] == '0')
-                    continue;
-                for (int k = j + 1; k < c.length; k++) {
-                    if (c[k] == '0')
-                        continue;
-                    double resid = polyAreas[i] - polyHats[i];
-                    double dx = resid * stepsize * (centers[j][0] - centers[k][0]);
-                    double dy = resid * stepsize * (centers[j][1] - centers[k][1]);
-                    gradients[j][0] += dx;
-                    gradients[j][1] += dy;
-                    gradients[k][0] -= dx;
-                    gradients[k][1] -= dy;
-                }
+    private void rescale() {
+        double v = 0.;
+        for (int j = 0; j < 2; j++) {
+            double c = 0.;
+            for (int k = 0; k < nCircles; k++)
+                c += centers[k][j];
+            c /= nCircles;
+            for (int k = 0; k < nCircles; k++) {
+                centers[k][j] -= c;
+                v += centers[k][j] * centers[k][j];
             }
         }
-        return gradients;
+        v = Math.sqrt(v / (2 * nCircles));
+        if (v > 0) {
+            for (int j = 0; j < 2; j++) {
+                for (int k = 0; k < nCircles; k++)
+                    centers[k][j] = centers[k][j] / v;
+            }
+        }
+        double[][] c = new double[nCircles][2];
+        for (int k = 0; k < nCircles; k++)
+            System.arraycopy(centers[k], 0, c[k], 0, 2);
+
+        double minStress = 1;
+        double minSize = 1;
+        for (double size = .01; size < .06; size += .01) {
+            for (int j = 0; j < 2; j++) {
+                for (int k = 0; k < nCircles; k++)
+                    centers[k][j] = .5 + size * c[k][j];
+            }
+            double s = computeStress();
+            if (s < minStress) {
+                minStress = s;
+                minSize = size;
+            }
+        }
+        for (int j = 0; j < 2; j++) {
+            for (int k = 0; k < nCircles; k++)
+                centers[k][j] = .5 + minSize * c[k][j];
+        }
     }
 }

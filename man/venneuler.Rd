@@ -4,25 +4,29 @@
 Calculates Venn and Euler Diagram
 }
 \description{
-\code{venneuler} calculates a Venn diagram from a disjoint set specification.
+\code{venneuler} calculates a Venn diagram from a set specification.
 }
 \usage{
 venneuler(combinations, weights, ...)
 }
 \arguments{
   \item{combinations}{
-This can be one of: a character vector (specifies class combinations as
-class names separated by the ampersand \code{\&} character --
-e.g. \code{c("A","B","A&B")}), a named numeric vector (names specify
-class combinations and values specify weights -- e.g. \code{c(A=1, B=2,
-  `A&B`=0.5)}), a character matrix of two columns (specifies mapping of
-elements to sets -- elements in first column and set names in second
-column, \code{weights} argument is ignored) or a logical or numeric
-matrix whose columns represent sets and co-occurrence is defined by
-non-zero (rep. \code{TRUE}) values in rows (weight for a row being 1 for
-logical matrices or the row sum for numeric matrices). For convenience
-data frames can be passed instead of matrices and they will be coerced
-using \code{as.matrix()}.
+This can be one of: 
+\itemize{
+\item a character vector (specifies disjoint class combinations as
+class names separated by the ampersand \code{&} character --
+e.g. \code{c("A","B","A&B")})
+\item a named numeric vector (names specify class combinations and
+values specify weights -- e.g. \code{c(A=1, B=2, `A&B`=0.5)})
+\item a character matrix of two columns (specifies mapping of
+elements to sets -- elements in the first column and set names in the
+second column, \code{weights} argument is ignored)
+\item a logical or numeric matrix whose columns represent sets and
+co-occurrence is defined by non-zero (rep. \code{TRUE}) values in rows
+(weight for a row being 1 for logical matrices or the row sum for
+numeric matrices).}
+For convenience data frames can be passed instead of matrices and they
+will be coerced using \code{as.matrix()}.
 }
   \item{weights}{
 If \code{combinations} is a character vector then this argument
@@ -55,7 +59,7 @@ An object of the class \code{VennDiagram} with following components:
 \examples{
 vd <- venneuler(c(A=0.3, B=0.3, C=1.1, "A&B"=0.1, "A&C"=0.2, "B&C"=0.1 ,"A&B&C"=0.1))
 plot(vd)
-# same as c(A=1, `A&B`=1, `B&C`=1, C=1)
+# same as c(A=1, `A&B&C`=1, C=1)
 m <- data.frame(elements=c("1","2","2","2","3"), sets=c("A","A","B","C","C"))
 v <- venneuler(m)
 plot(v)
