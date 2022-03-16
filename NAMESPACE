@@ -1,3 +1,5 @@
 import(rJava)
 export(venneuler)
+importFrom("grDevices", "col2rgb", "hcl", "rgb")
+importFrom("graphics", "plot.new", "plot.window", "polygon", "text", "title")
 S3method(plot, VennDiagram)

@@ -59,7 +59,7 @@ venneuler <- function(combinations, weights, ...) {
 }
 
 ## Note: in col.fn we need more croma and less luminance than usual, because we'll be plotting with reduced alpha
-plot.VennDiagram <- function(x, col, col.fn = function(col) hcl(col * 360, 130, 60), alpha=0.3, main=NULL, edges=200, border=NA, col.txt=1, ...) {
+plot.VennDiagram <- function(x, col, col.fn = function(col) hcl(col * 360, 130, 60), alpha=0.3, main=NULL, edges=200, border=NA, col.txt=1, cex=1, font=NULL, family="", ...) {
   # calculate total extents
   xtp <- x$centers + x$diameters / 2
   xtm <- x$centers - x$diameters / 2
@@ -85,7 +85,7 @@ plot.VennDiagram <- function(x, col, col.fn = function(col) hcl(col * 360, 130, 
   for (i in seq.int(n))
     polygon(x$centers[i, 1] +  x$diameters[i] * sx, x$centers[i, 2] + x$diameters[i] * sy, col = col[i], border = border[i])
   # if col.txt is not NA, plot the circle text
-  if (!all(is.na(col.txt))) text(x$centers, x$labels, col=col.txt)
+  if (!all(is.na(col.txt))) text(x$centers, x$labels, col=col.txt, cex=cex, font=font, family=family)
   # finish with title
   title(main = main, ...)
   invisible(NULL)
