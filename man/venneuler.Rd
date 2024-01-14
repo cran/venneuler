@@ -54,8 +54,9 @@ An object of the class \code{VennDiagram} with following components:
 \author{Lee Wilkinson <leland.wilkinson@gmail.com>, R package: Simon Urbanek <simon.urbanek@r-project.org>}
 %%\note{
 %%}
-%%\seealso{
-%%}
+\seealso{
+  \code{\link{plot.VennDiagram}}
+}
 \examples{
 vd <- venneuler(c(A=0.3, B=0.3, C=1.1, "A&B"=0.1, "A&C"=0.2, "B&C"=0.1 ,"A&B&C"=0.1))
 plot(vd)

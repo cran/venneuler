@@ -1,7 +1,7 @@
-c1881276670c651d4d9b20a4e95d13e2 *DESCRIPTION
+4c0deff1700e96d018edcfbc99926b4c *DESCRIPTION
 300733c4c1c81b353d10fc583a405362 *NAMESPACE
-78ff5b2c51473e407ebf3601a04da9e4 *NEWS
-8ed9b8ded4c81faac7551e198faddd6d *R/venneuler.R
+65d9aa26d391d6423f89783ffb351e6c *NEWS
+419bbbce18a17019794fdcfa283e1fc0 *R/venneuler.R
 17422a3bc93df08d04e2d18380998896 *R/zzz.R
 525ca855e2c652cda24724015dc3edda *inst/java/venneuler.jar
 dd6d391d407d89bc5ee31d5663b6e826 *java/Makefile
@@ -14,4 +14,5 @@ a9e2e35d6bd461437ab1d34794d57c04 *java/edu/uic/ncdm/venn/VennDiagram.java
 c737dab157a9eda33302f6aa512d3ad0 *java/edu/uic/ncdm/venn/data/VennData.java
 d2c94af240a4afa508688eadbaa96169 *java/edu/uic/ncdm/venn/display/VennCanvas.java
 94fbf40cb92f44ca6deebae2a7542f8f *java/edu/uic/ncdm/venn/display/VennFrame.java
-eb0ddf17f17153577e06345e679d34f6 *man/venneuler.Rd
+56a01f8d85d72f3003850016aea4dd3f *man/plot.VennDiagram.Rd
+98825c5629f05d798a4bdd7c81d42fbc *man/venneuler.Rd
